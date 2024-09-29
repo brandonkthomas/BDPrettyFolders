@@ -6,17 +6,28 @@
  * @version 1.2.2
  * @source https://github.com/webcrawls/discord
  * @updateUrl https://raw.githubusercontent.com/webcrawls/discord/master/pretty-folders.plugin.js
+ * @forkedBy brandonkthomas
+ * @forkedByLink https://github.com/brandonkthomas
+ * @forkDescription Fixed issue where the plugin had to be toggled off and on after starting Discord for the colors to apply.
  */
 module.exports = class MyPlugin {
-    start = () => Array.from(document.getElementsByClassName(FOLDER_WRAPPER)).forEach(attachFolder)
-    stop = () => Array.from(document.getElementsByClassName(FOLDER_WRAPPER)).forEach(detachFolder)
+    start = () => {
+        const observer = new MutationObserver(() => {
+            Array.from(document.getElementsByClassName(FOLDER_WRAPPER)).forEach(attachFolder);
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+    stop = () => {
+        Array.from(document.getElementsByClassName(FOLDER_WRAPPER)).forEach(resetFolder);
+        Object.values(observers).forEach((observer) => observer?.disconnect());
+    }
 };
 
 // Discord HTML classname constants
-const FOLDER_WRAPPER = "wrapper__832f2"
-const FOLDER_COLLAPSED = "collapsed__98ad5"
-const FOLDER_ICON_WRAPPER = "expandedFolderIconWrapper__324c1"
-const EXPANDED_FOLDER_BACKGROUND = "expandedFolderBackground_b1385f"
+const FOLDER_WRAPPER = "wrapper_bc7085"
+const FOLDER_COLLAPSED = "collapsed_bc7085"
+const FOLDER_ICON_WRAPPER = "expandedFolderIconWrapper_bc7085"
+const EXPANDED_FOLDER_BACKGROUND = "expandedFolderBackground_bc7085"
 
 // Utility methods to get key elements
 // Not exactly happy with how these, but hey, they're one-liners :D
